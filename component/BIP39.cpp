@@ -94,7 +94,8 @@ std::vector<std::string> get_words(std::string langage) {
         }
         input_stream.close();
     } else {
-        // Gérer l'erreur si le fichier n'est pas ouvert correctement
+        throw std::runtime_error("Failed to open wordlist file: " + file_name);
+    }
     }
 
     return words;
