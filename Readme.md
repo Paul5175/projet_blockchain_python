@@ -1,58 +1,63 @@
 
-
 ---
 
-# Module BIP39 : Génération de Seed Phrases pour Portefeuilles de Cryptomonnaies
+# Composant BIP39 - Transformateur de Clé Privée en Mnémonique
 
+Le composant BIP39 permet de générer une suite de 24 mots mnémoniques conformément au standard BIP39 à partir d'une clé privée de 256 bits. Il offre également la possibilité de convertir une suite mnémonique en une clé privée.
 
+## Installation
 
-Le module BIP39 est une bibliothèque de cryptographie permettant de créer des phrases de récupération (seed phrases) pour les portefeuilles de cryptomonnaies. Elle s'appuie sur le standard BIP39 (Bitcoin Improvement Proposal 39), une norme de sécurité clé pour les cryptomonnaies.
+1. Assurez-vous d'avoir Python 3.7 ou une version ultérieure installée sur votre système.
 
-## Aperçu
+2. Installez les dépendances requises, notamment pybind11. Vous pouvez l'installer via pip :
 
-Ce module facilite la génération de phrases de récupération, également connues sous le nom de "mnemonic phrases". Ces phrases permettent de récupérer l'accès à un portefeuille de cryptomonnaie en mémorisant une liste de mots. Les phrases de récupération ont généralement une longueur de 12 à 24 mots, ce qui les rend faciles à retenir.
+   ```
+   pip install pybind11
+   ```
 
-## Fonctionnalités Principales
+3. Compilez le composant en utilisant le Makefile fourni :
 
-Le module BIP39 propose les fonctionnalités suivantes :
+   ```
+   make
+   ```
 
-- **Génération de Phrases de Récupération** : Vous pouvez créer une phrase de récupération en spécifiant le nombre de mots souhaités (12, 15, 18, 21 ou 24) ainsi que la langue (français ou anglais).
+4. Vous pouvez maintenant utiliser le composant depuis Python en important le module `bip39`.
 
-- **Validation de Phrases de Récupération** : Vous pouvez vérifier si une phrase de récupération est valide et correspond à un portefeuille.
+## Utilisation
 
-## Cas d'Utilisation Courants
+### Génération d'une suite mnémonique depuis une clé privée
 
-Ce module est utile dans les situations suivantes :
+```python
+import bip39
 
-- **Création de Portefeuilles** : Il permet de générer une phrase de récupération lors de la création d'un nouveau portefeuille de cryptomonnaie.
-
-- **Récupération de Portefeuilles** : Un utilisateur peut retrouver l'accès à son portefeuille en saisissant sa phrase mnémonique s'il perd son portefeuille ou les informations d'accès.
-
-## Interface
-
-L'interface du module BIP39 est conçue pour être simple et directe. Elle propose deux fonctions principales :
-
-- `create_recovery_phrase(word_quantity, language)`: Cette fonction crée une phrase de récupération avec un nombre spécifique de mots dans la langue spécifiée.
-
-- `validate_recovery_phrase(recovery_phrase, language)`: Cette fonction vérifie si une phrase de récupération est valide pour la langue spécifiée.
-
-## Gestion des Erreurs
-
-Le module BIP39 gère les erreurs comme suit :
-
-- Lors de la création d'une phrase de récupération, une exception est déclenchée si le nombre de mots spécifié n'est pas dans l'intervalle autorisé (12, 15, 18, 21, 24) ou si la langue spécifiée n'est pas prise en charge.
-
-- Lors de la validation d'une phrase de récupération, une exception est déclenchée si la phrase est vide ou si elle ne correspond pas à un portefeuille valide pour la langue spécifiée.
-
-## Exécution des Tests
-
-Pour exécuter les tests du module BIP39, utilisez la commande suivante :
-
-```bash
-python -m pytest test_bip39.py
+private_key = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+mnemonic_phrase = bip39.create_mnemonic_from_private_key(private_key, "en")
+print(mnemonic_phrase)
 ```
 
-Les tests vérifieront toutes les fonctions de l'interface du module et s'assureront qu'elles fonctionnent correctement en renvoyant les résultats attendus.
+Assurez-vous que `private_key` est une chaîne hexadécimale de 64 caractères correspondant à une clé privée de 256 bits. La fonction `create_mnemonic_from_private_key` génère la suite mnémonique correspondante.
+
+### Conversion d'une suite mnémonique en clé privée
+
+```python
+import bip39
+
+mnemonic_phrase = "legal winner thank year wave sausage worth useful legal winner thank yellow"
+private_key = bip39.convert_to_private_key(mnemonic_phrase, "en")
+print(private_key)
+```
+
+La fonction `convert_to_private_key` prend une suite mnémonique en entrée et renvoie la clé privée correspondante.
+
+### Génération d'une suite mnémonique aléatoire
+
+```python
+import bip39
+
+mnemonic_phrase = bip39.create_recovery_phrase(24, "en")
+print(mnemonic_phrase)
+```
+
+Utilisez `create_recovery_phrase` pour générer une suite mnémonique aléatoire avec le nombre de mots souhaité (12, 15, 18, 21 ou 24) et la langue spécifiée ("en" pour l'anglais, "fr" pour le français).
 
 ---
-
