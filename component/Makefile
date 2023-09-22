@@ -1,24 +1,23 @@
-CPPFLAGS += `python3-config --includes`
-LIBS=`python3-config --ldflags`
+CPPFLAGS += -I /usr/include/python3.7m
+LIBS = -lpython3.7m
 
-COMPOSANT = crypto_component
-
+COMPOSANT = bip39
 LIBSO = ${COMPOSANT}.so
 LIBSO_OBJS = ${COMPOSANT}.o
 
-all: test $(LIBSO)
+%.o: %.cpp
+	g++ -c $(CPPFLAGS) $< -o $@
 
-include ../gcc.mk
-include ../pybind11.mk
+all: ${LIBSO}
 
+${LIBSO}: ${LIBSO_OBJS}
+	g++ -shared $^ $(LIBS) -o $@
 
-test: $(LIBSO)
-	echo "execution du test"
+test: ${LIBSO}
+	echo "Test execution"
 	python3 test.py
 
 clean:
-	rm -f ${LIBSO}  ${LIBSO_OBJS}
+	rm -f ${LIBSO} ${LIBSO_OBJS}
 
-
-${DESTINATION_LIBSO}: ${LIBSO}
-	cp $< $@
+.PHONY: all clean test
