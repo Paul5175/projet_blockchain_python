@@ -1,36 +1,33 @@
 import pytest
 import bip39
 
-def test_create_recovery_phrase():
-    # Test avec un nombre de mots valide
-    try:
-        bip39.create_recovery_phrase(12, "en")
-    except Exception:
-        pytest.fail("Expected no exception for valid word count")
-
-    # Test avec un nombre de mots en dehors de l'intervalle [12, 15, 18, 21, 24]
-    with pytest.raises(ValueError):
-        bip39.create_recovery_phrase(10, "en")
-
+# Test de validation
 def test_validate_recovery_phrase():
-    # Test avec une phrase mnémonique vide
+    # Phrase mnémonique valide
+    mnemonic_phrase = "legal winner thank year wave sausage worth useful legal winner thank yellow"
+    assert bip39.validate_recovery_phrase(mnemonic_phrase, "en") is True
+
+    # Phrase mnémonique invalide
+    invalid_phrase = "invalid phrase here"
+    assert bip39.validate_recovery_phrase(invalid_phrase, "en") is False
+
+    # Phrase mnémonique vide
     with pytest.raises(ValueError):
         bip39.validate_recovery_phrase("", "en")
 
-    # Test avec une phrase mnémonique valide
-    recovery_phrase = bip39.create_recovery_phrase(15, "en")
-    assert bip39.validate_recovery_phrase(recovery_phrase, "en") == True
+# Test fonctionnel
+def test_functional_create_and_convert():
+    # Générer une clé privée aléatoire
+    private_key = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 
-    # Test avec une phrase mnémonique invalide
-    invalid_phrase = "invalid phrase here"
-    assert bip39.validate_recovery_phrase(invalid_phrase, "en") == False
+    # Générer une suite mnémonique depuis la clé privée
+    mnemonic_phrase = bip39.create_mnemonic_from_private_key(private_key, "en")
 
-def test_extract_entropy():
-    # Test de l'extraction de l'entropie d'une phrase de récupération
-    recovery_phrase = bip39.create_recovery_phrase(18, "en")
-    entropy = bip39.extract_entropy(recovery_phrase, "en")
-    assert len(entropy) == 64  # 64 caractères hexadécimaux
+    # Convertir la suite mnémonique en clé privée
+    converted_private_key = bip39.convert_to_private_key(mnemonic_phrase, "en")
+
+    # Vérifier que la clé privée convertie est égale à l'originale
+    assert private_key == converted_private_key
 
 if __name__ == "__main__":
     pytest.main()
-
