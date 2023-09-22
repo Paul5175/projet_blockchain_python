@@ -146,52 +146,42 @@ std::string create_recovery_phrase(int word_quantity, const std::string& languag
     return convert_to_recovery_phrase(entropy_sequence + checksum_sequence, words_dict);
 }
 
-std::string extract_entropy(const std::string& recovery_phrase, const std::string& language) {
+std::string create_mnemonic_from_private_key(const std::string& private_key, const std::string& language) {
+    if (private_key.length() != 64) {
+        throw std::invalid_argument("Private key must be 64 characters (256 bits) hexadecimal string");
+    }
+
     std::vector<std::string> words_dict = get_words(language);
 
-    std::stringstream ss(recovery_phrase);
-    std::string buf;
-    std::vector<std::string> words;
+    std::string private_key_binary = hex_str_to_bin_str(private_key);
+    int entropy_bits = private_key_binary.length();
 
-    while (ss >> buf) {
-        words.push_back(buf);
+    if (entropy_bits % 32 != 0) {
+        throw std::invalid_argument("Invalid private key length");
     }
 
-    std::string words_string_binary;
-    int word_count = words.size();
+    int word_quantity = entropy_bits / 11;
+    int checksum_bits = (word_quantity * 11) % 32;
 
-    for (const std::string& w : words) {
-        auto it = std::find(words_dict.begin(), words_dict.end(), w);
+    auto checksum_sequence = private_key_binary.substr(0, checksum_bits);
+    auto entropy_sequence = private_key_binary.substr(checksum_bits);
 
-        if (it == words_dict.end()) {
-            throw std::invalid_argument("The word: " + w + " is not in the wordlist!");
-        }
+    std::vector<std::string> mnemonic_words;
 
-        words_string_binary += std::bitset<11>(std::distance(words_dict.begin(), it)).to_string();
+    for (size_t i = 0; i < entropy_sequence.length(); i += 11) {
+        auto sub = entropy_sequence.substr(i, 11);
+        auto word = words_dict[std::stoi(sub, nullptr, 2)];
+        mnemonic_words.push_back(word);
     }
 
-    std::string words_without_checksum = words_string_binary.substr(0, words_string_binary.length() - word_count);
-    std::string result;
-
-    for (size_t i = 0; i < words_without_checksum.length(); i += 8) {
-        result += bin_str_to_hex_str(words_without_checksum.substr(i, 8));
-    }
-
-    return result;
-}
-
-bool validate_recovery_phrase(const std::string& recovery_phrase, const std::string& language) {
-    if (recovery_phrase.empty()) {
-        throw std::invalid_argument("Empty phrase");
-    } else {
-        std::string extracted_entropy = extract_entropy(recovery_phrase, language);
-        std::string recreated_phrase = create_recovery_phrase(extracted_entropy.length() / 2 / 4, language);
-
-        return recovery_phrase == recreated_phrase;
-    }
+    return std::accumulate(std::next(mnemonic_words.begin()), mnemonic_words.end(), mnemonic_words[0], [](std::string a, std::string b) {
+        return std::move(a) + " " + b;
+    });
 }
 
 PYBIND11_MODULE(bip39, m) {
     m.def("create_recovery_phrase", &create_recovery_phrase, "Creates a new mnemonic phrase");
     m.def("validate_recovery_phrase", &validate_recovery_phrase, "Validates if a mnemonic phrase exists");
+    m.def("convert_to_private_key", &convert_to_private_key, "Converts a mnemonic phrase to a private key");
+    m.def("create_mnemonic_from_private_key", &create_mnemonic_from_private_key, "Creates a mnemonic phrase from a private key");
 }
