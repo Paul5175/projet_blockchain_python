@@ -56,4 +56,3 @@ Les tests vérifieront toutes les fonctions de l'interface du module et s'assure
 
 ---
 
-N'hésitez pas à personnaliser davantage ce README en ajoutant des informations spécifiques à votre projet.
