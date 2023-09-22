@@ -1,10 +1,10 @@
-Bien sûr, voici une version du README avec une structure modifiée et sans identifiants spécifiques :
+
 
 ---
 
 # Module BIP39 : Génération de Seed Phrases pour Portefeuilles de Cryptomonnaies
 
-![BIP39 Logo](bip39_logo.png)
+
 
 Le module BIP39 est une bibliothèque de cryptographie permettant de créer des phrases de récupération (seed phrases) pour les portefeuilles de cryptomonnaies. Elle s'appuie sur le standard BIP39 (Bitcoin Improvement Proposal 39), une norme de sécurité clé pour les cryptomonnaies.
 
