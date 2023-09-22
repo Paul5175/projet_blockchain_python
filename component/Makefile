@@ -6,18 +6,18 @@ LIBSO = ${COMPOSANT}.so
 LIBSO_OBJS = ${COMPOSANT}.o
 
 %.o: %.cpp
-	g++ -c $(CPPFLAGS) $< -o $@
+    g++ -c $(CPPFLAGS) $< -o $@
 
 all: ${LIBSO}
 
 ${LIBSO}: ${LIBSO_OBJS}
-	g++ -shared $^ $(LIBS) -o $@
+    g++ -shared $^ $(LIBS) -o $@
 
 test: ${LIBSO}
-	echo "Test execution"
-	python3 test.py
+    echo "Test execution"
+    python3 test.py
 
 clean:
-	rm -f ${LIBSO} ${LIBSO_OBJS}
+    rm -f ${LIBSO} ${LIBSO_OBJS}
 
 .PHONY: all clean test
